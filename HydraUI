@@ -253,6 +253,36 @@ task.spawn(function()
     TitleText.MaxVisibleGraphemes = -1
 end)
 
+-- contador de jugadores usando Hydra: avisa al servidor cada 60 s y este devuelve cuantos hay
+local HYDRA_COUNT_URL = "https://chatglobal.up.railway.app/api/hydra/heartbeat"
+local CountPill = mk("Frame", {Size = UDim2.fromOffset(0, 20), AutomaticSize = Enum.AutomaticSize.X, BackgroundColor3 = C.Card, BorderSizePixel = 0, Visible = false, LayoutOrder = 2, Parent = TitleRow})
+corner(CountPill, 999)
+stroke(CountPill, C.Stroke, 0.3)
+mk("UIPadding", {PaddingLeft = UDim.new(0, 8), PaddingRight = UDim.new(0, 9), Parent = CountPill})
+mk("UIListLayout", {FillDirection = Enum.FillDirection.Horizontal, VerticalAlignment = Enum.VerticalAlignment.Center, Padding = UDim.new(0, 5), SortOrder = Enum.SortOrder.LayoutOrder, Parent = CountPill})
+local CountDot = mk("Frame", {Size = UDim2.fromOffset(7, 7), BackgroundColor3 = C.Good, BorderSizePixel = 0, LayoutOrder = 1, Parent = CountPill})
+corner(CountDot, 999)
+local CountText = mk("TextLabel", {Size = UDim2.new(0, 0, 1, 0), AutomaticSize = Enum.AutomaticSize.X, BackgroundTransparency = 1, Text = "", TextColor3 = C.Text, Font = Enum.Font.GothamBold, TextSize = 11, LayoutOrder = 2, Parent = CountPill})
+task.spawn(function()
+    local sendRequest = (syn and syn.request) or http_request or request or (fluxus and fluxus.request)
+    if not sendRequest then return end
+    local HttpService = game:GetService("HttpService")
+    local body = HttpService:JSONEncode({playerId = tostring(LocalPlayer.UserId)})
+    while Gui.Parent do
+        pcall(function()
+            local response = sendRequest({Url = HYDRA_COUNT_URL, Method = "POST", Headers = {["Content-Type"] = "application/json"}, Body = body})
+            if response and tonumber(response.StatusCode) == 200 then
+                local data = HttpService:JSONDecode(response.Body)
+                if type(data) == "table" and tonumber(data.count) then
+                    CountText.Text = tostring(math.floor(tonumber(data.count)))
+                    CountPill.Visible = true
+                end
+            end
+        end)
+        task.wait(60)
+    end
+end)
+
 local HeaderSub = mk("TextLabel", {Size = UDim2.new(1, -196, 0, 14), Position = UDim2.fromOffset(16, 36), BackgroundTransparency = 1, Text = "", TextColor3 = C.Dim, Font = Enum.Font.GothamMedium, TextSize = 11, TextXAlignment = Enum.TextXAlignment.Left, TextTruncate = Enum.TextTruncate.AtEnd, Parent = Header})
 local function headerButton(text, offset, image)
     local button = mk("TextButton", {Size = UDim2.fromOffset(28, 28), AnchorPoint = Vector2.new(1, 0.5), Position = UDim2.new(1, offset, 0, 28), BackgroundColor3 = C.Card, AutoButtonColor = false, Text = image and "" or text, TextColor3 = C.Dim, Font = Enum.Font.GothamBold, TextSize = 14, Parent = Header})
