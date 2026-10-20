@@ -1,4 +1,4 @@
-local HYDRA_URL = "https://raw.githubusercontent.com/ZINZEROX/Ni/refs/heads/main/UIV2"
+local HYDRA_URL = "https://raw.githubusercontent.com/Yinyangzx/Yin-Imag/refs/heads/main/HydraUI"
 
 local HydraKey = {
     PORTAL = "https://yinyangkeysystemnick.up.railway.app/",
