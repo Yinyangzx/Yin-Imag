@@ -5,6 +5,7 @@ local HydraKey = {
     FILE = "Hydra_Key.txt",
     LOGO = "rbxassetid://114974832117287",
     lib = nil,
+    ENABLED = false, -- false = sistema key desactivado temporalmente (no carga la GUI ni valida); true = vuelve a funcionar como antes
 }
 HydraKey.VALIDATE = HydraKey.PORTAL .. "api/validate?key="
 task.spawn(function()
@@ -356,7 +357,192 @@ function HydraKey.run()
     return state.authorized
 end
 
-if not HydraKey.run() then return end
+-- Aviso de mantenimiento (se muestra mientras el sistema key esta desactivado: HydraKey.ENABLED = false)
+HydraKey.MAINT = {
+    LOGO = "rbxassetid://138681977482040",
+    DURATION = 25, -- segundos antes de cerrarse solo (0 = no se cierra solo)
+    TEXT = {
+        en = {tag = "MAINTENANCE",
+            msg = "Yin Yang will be undergoing maintenance. We apologize for this, but it's for the good of our script. It will be back in a few days. We'll announce everything on our Discord server!"},
+        es = {tag = "MANTENIMIENTO",
+            msg = "Yin Yang entrar\195\161 en mantenimiento. Pedimos disculpas por esto, pero es por el bien de nuestro script. Volver\195\161 en unos d\195\173as. \194\161Anunciaremos todo en nuestro servidor de Discord!"},
+        pt = {tag = "MANUTEN\195\135\195\131O",
+            msg = "O Yin Yang entrar\195\161 em manuten\195\167\195\163o. Pedimos desculpas por isso, mas \195\169 para o bem do nosso script. Ele voltar\195\161 em alguns dias. Vamos anunciar tudo no nosso servidor do Discord!"},
+        fr = {tag = "MAINTENANCE",
+            msg = "Yin Yang va entrer en maintenance. Nous nous en excusons, mais c'est pour le bien de notre script. Il sera de retour dans quelques jours. Nous annoncerons tout sur notre serveur Discord !"},
+        de = {tag = "WARTUNG",
+            msg = "Yin Yang wird gewartet. Wir entschuldigen uns daf\195\188r, aber es dient dem Wohl unseres Scripts. Es ist in ein paar Tagen wieder da. Wir geben alles auf unserem Discord-Server bekannt!"},
+        it = {tag = "MANUTENZIONE",
+            msg = "Yin Yang andr\195\160 in manutenzione. Ci scusiamo per questo, ma \195\168 per il bene del nostro script. Torner\195\160 tra pochi giorni. Annunceremo tutto sul nostro server Discord!"},
+        ru = {tag = "\208\162\208\149\208\165\208\160\208\144\208\145\208\158\208\162\208\171",
+            msg = "Yin Yang \209\131\209\133\208\190\208\180\208\184\209\130 \208\189\208\176 \209\130\208\181\209\133\208\189\208\184\209\135\208\181\209\129\208\186\208\190\208\181 \208\190\208\177\209\129\208\187\209\131\208\182\208\184\208\178\208\176\208\189\208\184\208\181. \208\159\209\128\208\184\208\189\208\190\209\129\208\184\208\188 \208\184\208\183\208\178\208\184\208\189\208\181\208\189\208\184\209\143, \208\189\208\190 \209\141\209\130\208\190 \208\189\209\131\208\182\208\189\208\190 \208\180\208\187\209\143 \209\131\208\187\209\131\209\135\209\136\208\181\208\189\208\184\209\143 \208\189\208\176\209\136\208\181\208\179\208\190 \209\129\208\186\209\128\208\184\208\191\209\130\208\176. \208\158\208\189 \208\178\208\181\209\128\208\189\209\145\209\130\209\129\209\143 \209\135\208\181\209\128\208\181\208\183 \208\189\208\181\209\129\208\186\208\190\208\187\209\140\208\186\208\190 \208\180\208\189\208\181\208\185. \208\158\208\177\208\190 \208\178\209\129\209\145\208\188 \208\190\208\177\209\138\209\143\208\178\208\184\208\188 \208\189\208\176 \208\189\208\176\209\136\208\181\208\188 Discord-\209\129\208\181\209\128\208\178\208\181\209\128\208\181!"},
+        tr = {tag = "BAKIM",
+            msg = "Yin Yang bak\196\177ma al\196\177nacak. Bunun i\195\167in \195\182z\195\188r dileriz, ancak bu scriptimizin iyili\196\159i i\195\167in. Birka\195\167 g\195\188n i\195\167inde geri d\195\182necek. Her \197\159eyi Discord sunucumuzda duyuraca\196\159\196\177z!"},
+        pl = {tag = "KONSERWACJA",
+            msg = "Yin Yang przechodzi konserwacj\196\153. Przepraszamy za to, ale robimy to dla dobra naszego skryptu. Wr\195\179ci za kilka dni. Wszystko og\197\130osimy na naszym serwerze Discord!"},
+        id = {tag = "PEMELIHARAAN",
+            msg = "Yin Yang akan menjalani pemeliharaan. Kami mohon maaf, tetapi ini demi kebaikan script kami. Script akan kembali dalam beberapa hari. Kami akan mengumumkan semuanya di server Discord kami!"},
+        vi = {tag = "B\225\186\162O TR\195\140",
+            msg = "Yin Yang s\225\186\189 \196\145\198\176\225\187\163c b\225\186\163o tr\195\172. Ch\195\186ng t\195\180i xin l\225\187\151i v\195\172 \196\145i\225\187\129u n\195\160y, nh\198\176ng \196\145\195\162y l\195\160 v\195\172 l\225\187\163i \195\173ch c\225\187\167a script. Script s\225\186\189 tr\225\187\159 l\225\186\161i sau v\195\160i ng\195\160y. Ch\195\186ng t\195\180i s\225\186\189 th\195\180ng b\195\161o m\225\187\141i th\225\187\169 tr\195\170n m\195\161y ch\225\187\167 Discord c\225\187\167a m\195\172nh!"},
+        ja = {tag = "\227\131\161\227\131\179\227\131\134\227\131\138\227\131\179\227\130\185",
+            msg = "Yin Yang\227\129\175\227\131\161\227\131\179\227\131\134\227\131\138\227\131\179\227\130\185\227\129\171\229\133\165\227\130\138\227\129\190\227\129\153\227\128\130\227\129\148\232\191\183\230\131\145\227\130\146\227\129\138\227\129\139\227\129\145\227\129\151\227\129\166\231\148\179\227\129\151\232\168\179\227\129\130\227\130\138\227\129\190\227\129\155\227\130\147\227\129\140\227\128\129\227\130\185\227\130\175\227\131\170\227\131\151\227\131\136\227\130\146\227\130\136\227\130\138\232\137\175\227\129\143\227\129\153\227\130\139\227\129\159\227\130\129\227\129\167\227\129\153\227\128\130\230\149\176\230\151\165\229\190\140\227\129\171\229\190\169\229\184\176\227\129\151\227\129\190\227\129\153\227\128\130\232\169\179\231\180\176\227\129\175Discord\227\130\181\227\131\188\227\131\144\227\131\188\227\129\167\227\129\138\231\159\165\227\130\137\227\129\155\227\129\151\227\129\190\227\129\153\239\188\129"},
+        ko = {tag = "\236\160\144\234\178\128",
+            msg = "Yin Yang\236\157\180 \236\160\144\234\178\128\236\151\144 \235\147\164\236\150\180\234\176\145\235\139\136\235\139\164. \235\182\136\237\142\184\236\157\132 \235\147\156\235\160\164 \236\163\132\236\134\161\237\149\152\236\167\128\235\167\140, \236\138\164\237\129\172\235\166\189\237\138\184\235\165\188 \235\141\148 \236\162\139\234\178\140 \235\167\140\235\147\164\234\184\176 \236\156\132\237\149\156 \234\178\131\236\158\133\235\139\136\235\139\164. \235\169\176\236\185\160 \237\155\132 \235\139\164\236\139\156 \235\143\140\236\149\132\236\152\181\235\139\136\235\139\164. \235\170\168\235\147\160 \235\130\180\236\154\169\236\157\128 Discord \236\132\156\235\178\132\236\151\144\236\132\156 \234\179\181\236\167\128\237\149\152\234\178\160\236\138\181\235\139\136\235\139\164!"},
+        zh_cn = {tag = "\231\187\180\230\138\164\228\184\173",
+            msg = "Yin Yang \229\141\179\229\176\134\232\191\155\229\133\165\231\187\180\230\138\164\227\128\130\229\175\185\230\173\164\230\136\145\228\187\172\230\183\177\232\161\168\230\173\137\230\132\143\239\188\140\228\189\134\232\191\153\230\152\175\228\184\186\228\186\134\232\174\169\232\132\154\230\156\172\229\143\152\229\190\151\230\155\180\229\165\189\227\128\130\229\135\160\229\164\169\229\144\142\229\176\177\228\188\154\230\129\162\229\164\141\227\128\130\230\136\145\228\187\172\228\188\154\229\156\168 Discord \230\156\141\229\138\161\229\153\168\228\184\138\229\143\145\229\184\131\230\137\128\230\156\137\229\133\172\229\145\138\239\188\129"},
+        zh_tw = {tag = "\231\182\173\232\173\183\228\184\173",
+            msg = "Yin Yang \229\141\179\229\176\135\233\128\178\229\133\165\231\182\173\232\173\183\227\128\130\229\176\141\230\173\164\230\136\145\229\128\145\230\183\177\230\132\159\230\138\177\230\173\137\239\188\140\228\189\134\233\128\153\230\152\175\231\130\186\228\186\134\232\174\147\232\133\179\230\156\172\232\174\138\229\190\151\230\155\180\229\165\189\227\128\130\229\185\190\229\164\169\229\190\140\229\176\177\230\156\131\230\129\162\229\190\169\227\128\130\230\136\145\229\128\145\230\156\131\229\156\168 Discord \228\188\186\230\156\141\229\153\168\228\184\138\231\153\188\228\189\136\230\137\128\230\156\137\229\133\172\229\145\138\239\188\129"},
+    },
+}
+function HydraKey.maintenance()
+    local Players = game:GetService("Players")
+    local TweenService = game:GetService("TweenService")
+    local LocalizationService = game:GetService("LocalizationService")
+    local player = Players.LocalPlayer
+    local M = HydraKey.MAINT
+    local C = {Bg = Color3.fromRGB(12, 14, 19), Field = Color3.fromRGB(38, 43, 54), Text = Color3.fromRGB(248, 249, 252), Dim = Color3.fromRGB(190, 195, 208),
+        Accent = Color3.fromRGB(236, 239, 245), AccentDark = Color3.fromRGB(140, 146, 160), Stroke = Color3.fromRGB(150, 156, 172)}
+    local lang = "en"
+    local function pickLang(locale)
+        local l = string.lower(tostring(locale or "")):gsub("_", "-")
+        local code = string.sub(l, 1, 2)
+        if code == "zh" then
+            if string.find(l, "tw", 1, true) or string.find(l, "hk", 1, true) or string.find(l, "hant", 1, true) then return "zh_tw" end
+            return "zh_cn"
+        end
+        if M.TEXT[code] then return code end
+        return "en"
+    end
+    pcall(function() lang = pickLang(LocalizationService.SystemLocaleId) end)
+    pcall(function()
+        local id = player.LocaleId
+        if type(id) == "string" and #id > 0 then lang = pickLang(id) end
+    end)
+    local function t(k) return (M.TEXT[lang] or M.TEXT.en)[k] end
+    local function mk(class, props)
+        local inst = Instance.new(class)
+        for k, v in pairs(props) do if k ~= "Parent" then inst[k] = v end end
+        if class == "TextLabel" or class == "TextBox" or class == "TextButton" then
+            local o = Instance.new("UIStroke")
+            o.ApplyStrokeMode = Enum.ApplyStrokeMode.Contextual
+            o.Color = Color3.new(0, 0, 0)
+            o.Thickness = 1
+            o.Transparency = 0.55
+            o.Parent = inst
+        end
+        inst.Parent = props.Parent
+        return inst
+    end
+    local function corner(p, r) return mk("UICorner", {CornerRadius = UDim.new(0, r), Parent = p}) end
+    local function stroke(p, color, tr, th) return mk("UIStroke", {Color = color, Transparency = tr or 0, Thickness = th or 1, ApplyStrokeMode = Enum.ApplyStrokeMode.Border, Parent = p}) end
+    local function tween(i, time, goals, style, dir)
+        local tw = TweenService:Create(i, TweenInfo.new(time, style or Enum.EasingStyle.Quint, dir or Enum.EasingDirection.Out), goals)
+        tw:Play()
+        return tw
+    end
+
+    local parent = nil
+    pcall(function() if typeof(gethui) == "function" then parent = gethui() end end)
+    if not parent then pcall(function() parent = game:GetService("CoreGui") end) end
+    parent = parent or player:WaitForChild("PlayerGui")
+    local old = parent:FindFirstChild("HydraMaintenance")
+    if old then old:Destroy() end
+    local gui = mk("ScreenGui", {Name = "HydraMaintenance", ResetOnSpawn = false, IgnoreGuiInset = false, ZIndexBehavior = Enum.ZIndexBehavior.Sibling, DisplayOrder = 100, Parent = parent})
+
+    local panel = mk("Frame", {Size = UDim2.new(0.92, 0, 0, 0), AutomaticSize = Enum.AutomaticSize.Y, AnchorPoint = Vector2.new(0.5, 0), Position = UDim2.new(0.5, 0, 0, -220),
+        BackgroundColor3 = C.Bg, BackgroundTransparency = 0.04, BorderSizePixel = 0, Parent = gui})
+    mk("UISizeConstraint", {MaxSize = Vector2.new(340, math.huge), Parent = panel})
+    corner(panel, 16)
+    local scale = mk("UIScale", {Scale = 0.9, Parent = panel})
+
+    local ring = stroke(panel, Color3.new(1, 1, 1), 0.15, 1.4)
+    local ringGrad = mk("UIGradient", {Color = ColorSequence.new({ColorSequenceKeypoint.new(0, C.AccentDark), ColorSequenceKeypoint.new(0.45, C.AccentDark),
+        ColorSequenceKeypoint.new(0.5, Color3.new(1, 1, 1)), ColorSequenceKeypoint.new(0.55, C.AccentDark), ColorSequenceKeypoint.new(1, C.AccentDark)}), Parent = ring})
+    local ringSpin = TweenService:Create(ringGrad, TweenInfo.new(4, Enum.EasingStyle.Linear, Enum.EasingDirection.InOut, -1), {Rotation = 360})
+    ringSpin:Play()
+
+    local glow = mk("Frame", {Size = UDim2.new(1, 0, 0, 90), BackgroundColor3 = Color3.new(1, 1, 1), BorderSizePixel = 0, Parent = panel})
+    corner(glow, 16)
+    mk("UIGradient", {Rotation = 90, Transparency = NumberSequence.new({NumberSequenceKeypoint.new(0, 0.9), NumberSequenceKeypoint.new(1, 1)}), Parent = glow})
+    local body = mk("Frame", {Size = UDim2.new(1, 0, 0, 0), AutomaticSize = Enum.AutomaticSize.Y, BackgroundTransparency = 1, Parent = panel})
+    mk("UIPadding", {PaddingTop = UDim.new(0, 14), PaddingBottom = UDim.new(0, 14), PaddingLeft = UDim.new(0, 16), PaddingRight = UDim.new(0, 16), Parent = body})
+    mk("UIListLayout", {Padding = UDim.new(0, 10), SortOrder = Enum.SortOrder.LayoutOrder, Parent = body})
+
+    local head = mk("Frame", {Size = UDim2.new(1, 0, 0, 46), BackgroundTransparency = 1, LayoutOrder = 1, Parent = body})
+    local logo = mk("ImageLabel", {Size = UDim2.fromOffset(44, 44), BackgroundTransparency = 1, Image = M.LOGO, ScaleType = Enum.ScaleType.Fit, Parent = head})
+    TweenService:Create(logo, TweenInfo.new(2.2, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut, -1, true), {Rotation = 4}):Play()
+    local title = mk("TextLabel", {Size = UDim2.new(1, -100, 0, 26), Position = UDim2.fromOffset(54, 0), BackgroundTransparency = 1, Text = "YIN YANG", TextColor3 = Color3.new(1, 1, 1),
+        Font = Enum.Font.GothamBlack, TextSize = 22, TextXAlignment = Enum.TextXAlignment.Left, Parent = head})
+    local shine = mk("UIGradient", {Color = ColorSequence.new({ColorSequenceKeypoint.new(0, C.AccentDark), ColorSequenceKeypoint.new(0.45, C.Accent),
+        ColorSequenceKeypoint.new(0.5, Color3.new(1, 1, 1)), ColorSequenceKeypoint.new(0.55, C.Accent), ColorSequenceKeypoint.new(1, C.AccentDark)}), Offset = Vector2.new(-1, 0), Parent = title})
+    TweenService:Create(shine, TweenInfo.new(2.4, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut, -1, false, 0.6), {Offset = Vector2.new(1, 0)}):Play()
+    local tag = mk("TextLabel", {Size = UDim2.fromOffset(0, 17), AutomaticSize = Enum.AutomaticSize.X, Position = UDim2.fromOffset(54, 27), BackgroundColor3 = Color3.new(1, 1, 1),
+        BackgroundTransparency = 0.88, Text = t("tag"), TextColor3 = C.Text, Font = Enum.Font.GothamBold, TextSize = 10, Parent = head})
+    mk("UIPadding", {PaddingLeft = UDim.new(0, 9), PaddingRight = UDim.new(0, 9), Parent = tag})
+    corner(tag, 99)
+    stroke(tag, C.Stroke, 0.55)
+    local close = mk("TextButton", {Size = UDim2.fromOffset(28, 28), AnchorPoint = Vector2.new(1, 0), Position = UDim2.new(1, 0, 0, 0), BackgroundColor3 = Color3.new(1, 1, 1),
+        BackgroundTransparency = 0.9, AutoButtonColor = false, Text = "\195\151", TextColor3 = C.Text, Font = Enum.Font.GothamBold, TextSize = 18, Parent = head})
+    corner(close, 99)
+    stroke(close, C.Stroke, 0.6)
+    local closeScale = mk("UIScale", {Scale = 1, Parent = close})
+    close.MouseEnter:Connect(function() tween(closeScale, 0.15, {Scale = 1.06}) end)
+    close.MouseLeave:Connect(function() tween(closeScale, 0.2, {Scale = 1}) end)
+    close.MouseButton1Down:Connect(function() tween(closeScale, 0.08, {Scale = 0.94}) end)
+    close.MouseButton1Up:Connect(function() tween(closeScale, 0.3, {Scale = 1}, Enum.EasingStyle.Back) end)
+
+    mk("Frame", {Size = UDim2.new(1, 0, 0, 1), BackgroundColor3 = Color3.new(1, 1, 1), BackgroundTransparency = 0.88, BorderSizePixel = 0, LayoutOrder = 2, Parent = body})
+    local msg = mk("TextLabel", {Size = UDim2.new(1, 0, 0, 0), AutomaticSize = Enum.AutomaticSize.Y, BackgroundTransparency = 1, Text = t("msg"), TextColor3 = C.Text,
+        Font = Enum.Font.GothamMedium, TextSize = 13, LineHeight = 1.15, TextWrapped = true, TextXAlignment = Enum.TextXAlignment.Left, TextYAlignment = Enum.TextYAlignment.Top,
+        LayoutOrder = 3, Parent = body})
+
+    local track = mk("Frame", {Size = UDim2.new(1, 0, 0, 3), BackgroundColor3 = C.Field, BorderSizePixel = 0, ClipsDescendants = true, LayoutOrder = 4, Parent = body})
+    corner(track, 99)
+    local fill = mk("Frame", {Size = UDim2.fromScale(1, 1), BackgroundColor3 = C.Accent, BorderSizePixel = 0, Parent = track})
+    corner(fill, 99)
+
+    local state = {closed = false}
+    local function refresh()
+        tag.Text = t("tag")
+        msg.Text = t("msg")
+    end
+    task.spawn(function()
+        local ok, translator = pcall(function() return LocalizationService:GetTranslatorForPlayerAsync(player) end)
+        if ok and translator then
+            lang = pickLang(translator.LocaleId)
+            refresh()
+            pcall(function()
+                translator:GetPropertyChangedSignal("LocaleId"):Connect(function() lang = pickLang(translator.LocaleId) refresh() end)
+            end)
+        end
+    end)
+
+    local function dismiss()
+        if state.closed then return end
+        state.closed = true
+        pcall(function() ringSpin:Cancel() end)
+        tween(panel, 0.3, {Position = UDim2.new(0.5, 0, 0, -(panel.AbsoluteSize.Y + 30))}, Enum.EasingStyle.Quad, Enum.EasingDirection.In)
+        local out = tween(scale, 0.3, {Scale = 0.9}, Enum.EasingStyle.Quad, Enum.EasingDirection.In)
+        out.Completed:Wait()
+        if gui.Parent then gui:Destroy() end
+    end
+    close.Activated:Connect(function() task.spawn(dismiss) end)
+
+    tween(panel, 0.55, {Position = UDim2.new(0.5, 0, 0, 12)}, Enum.EasingStyle.Back)
+    tween(scale, 0.45, {Scale = 1}, Enum.EasingStyle.Back)
+    if type(M.DURATION) == "number" and M.DURATION > 0 then
+        tween(fill, M.DURATION, {Size = UDim2.fromScale(0, 1)}, Enum.EasingStyle.Linear)
+        task.delay(M.DURATION, function() task.spawn(dismiss) end)
+    else
+        track.Visible = false
+    end
+end
+
+if HydraKey.ENABLED then
+    if not HydraKey.run() then return end
+else
+    task.spawn(HydraKey.maintenance)
+end
 
 local Hydra = loadstring(HydraKey.lib or game:HttpGet(HYDRA_URL))()
 
